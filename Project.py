@@ -118,41 +118,16 @@ def calculate_burnout_index(faculty_id):
     burnout = min(total_hours * 2.5, 100)
     return int(burnout)
 
-from difflib import SequenceMatcher
-
-def similarity(a, b):
-    return SequenceMatcher(None, a.lower(), b.lower()).ratio()
-
 def get_expertise_match(faculty_id, subject):
-    """Improved expertise match using string similarity"""
-    
+    """Get expertise match percentage"""
     faculty = faculty_collection.find_one({"_id": faculty_id})
     if not faculty or faculty.get("admin", False):
         return 0
-
-    expertise_list = faculty.get("expertise", [])
     
-    if not expertise_list:
-        return 30
-
-    best_score = 0
-
-    for exp in expertise_list:
-        sim = similarity(subject, exp)   # 0 → 1
-        score = int(sim * 100)
-
-        if score > best_score:
-            best_score = score
-
-    # Apply thresholds to stabilize results
-    if best_score >= 80:
+    expertise = faculty.get("expertise", [])
+    if subject.lower() in [e.lower() for e in expertise]:
         return 95
-    elif best_score >= 60:
-        return 80
-    elif best_score >= 40:
-        return 65
-    else:
-        return 40
+    return 30
 
 # Export timetable to CSV
 def export_timetable_to_csv():
