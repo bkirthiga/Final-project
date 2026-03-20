@@ -119,15 +119,38 @@ def calculate_burnout_index(faculty_id):
     return int(burnout)
 
 def get_expertise_match(faculty_id, subject):
-    """Get expertise match percentage"""
+    """Improved expertise matching using keyword similarity (0–100 scale)"""
+    
     faculty = faculty_collection.find_one({"_id": faculty_id})
     if not faculty or faculty.get("admin", False):
         return 0
+
+    expertise_list = faculty.get("expertise", [])
     
-    expertise = faculty.get("expertise", [])
-    if subject.lower() in [e.lower() for e in expertise]:
-        return 95
-    return 30
+    if not expertise_list:
+        return 20  # No expertise listed → low baseline score
+
+    subject_words = set(subject.lower().split())
+
+    best_score = 0
+
+    for exp in expertise_list:
+        exp_words = set(exp.lower().split())
+        
+        # Calculate similarity (intersection ratio)
+        common_words = subject_words & exp_words
+        match_ratio = len(common_words) / max(len(subject_words), 1)
+
+        score = int(match_ratio * 100)
+
+        if score > best_score:
+            best_score = score
+
+    # Ensure minimum score (avoid 0 unless completely unrelated)
+    if best_score == 0:
+        return 30
+
+    return best_score
 
 # Export timetable to CSV
 def export_timetable_to_csv():
