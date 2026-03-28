@@ -881,7 +881,11 @@ if st.session_state.is_admin:
                 avg_duties = total_duty_hours / len(staff_list) if staff_list else 0
                 st.metric("Avg Duty Hours", f"{avg_duties:.1f}")
             with col3:
-                scheduled_percentage = (scheduled_count / subjects_count * 100) if subjects_count > 0 else 0
+                unique_scheduled_subjects = len(timetable_collection.distinct("subject_code"))
+
+scheduled_percentage = (
+    unique_scheduled_subjects / subjects_count * 100
+) if subjects_count > 0 else 0
                 st.metric("Scheduling Efficiency", f"{scheduled_percentage:.1f}%")
             
             st.subheader("Recent Staff Activity")
