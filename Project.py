@@ -883,10 +883,10 @@ if st.session_state.is_admin:
             with col3:
                 unique_scheduled_subjects = len(timetable_collection.distinct("subject_code"))
 
-scheduled_percentage = (
-    unique_scheduled_subjects / subjects_count * 100
-) if subjects_count > 0 else 0
-st.metric("Scheduling Efficiency", f"{scheduled_percentage:.1f}%")
+                scheduled_percentage = (
+                    unique_scheduled_subjects / subjects_count * 100
+                ) if subjects_count > 0 else 0
+                st.metric("Scheduling Efficiency", f"{scheduled_percentage:.1f}%")
             
             st.subheader("Recent Staff Activity")
             staff_ids = [s["_id"] for s in staff_list]
